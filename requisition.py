@@ -50,3 +50,48 @@ class Requisition:
         else:
             self.status = "Pending"
             Requisition.total_pending += 1
+    def respond_requisition(self, decision):
+        # manager can only respond to a pending requisition
+        if self.status != "Pending":
+            print(f"Requisition {self.requisition_id} is already {self.status}.")
+            return
+
+        if decision == "Approved":
+            self.status = "Approved"
+            self.approval_ref = self.make_approval_ref()
+            Requisition.total_approved += 1
+            Requisition.total_pending -= 1
+        elif decision == "Not approved":
+            self.status = "Not approved"
+            Requisition.total_not_approved += 1
+            Requisition.total_pending -= 1
+        elif decision == "Pending":
+            print(f"Requisition {self.requisition_id} is left as Pending.")
+        else:
+            print("Invalid decision. Use Approved, Not approved or Pending.")
+
+    def display_requisition(self):
+        print(f"Date: {self.date}")
+        print(f"Requisition ID: {self.requisition_id}")
+        print(f"Staff ID: {self.staff_id}")
+        print(f"Staff Name: {self.staff_name}")
+        print(f"Total: ${self.total}")
+        print(f"Status: {self.status}")
+        print(f"Approval Reference Number: {self.approval_ref}")
+        print()
+
+    @classmethod
+    def requisition_statistics(cls):
+
+        print("Displaying the Requisition Statistics")
+        print(f"The total number of requisitions submitted: {cls.total_submitted}")
+        print(f"The total number of approved requisitions: {cls.total_approved}")
+        print(f"The total number of pending requisitions: {cls.total_pending}")
+        print(f"The total number of not approved requisitions: {cls.total_not_approved}")
+        print()
+        return {
+            "submitted": cls.total_submitted,
+            "approved": cls.total_approved,
+            "pending": cls.total_pending,
+            "not approved": cls.total_not_approved,
+        }
