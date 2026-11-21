@@ -95,3 +95,52 @@ class Requisition:
             "pending": cls.total_pending,
             "not approved": cls.total_not_approved,
         }
+
+
+    @staticmethod
+    def capture_items():
+        # data capture: ask for each item and its cost until the user presses Enter
+        items = []
+        while True:
+            item_name = input("Item name (press Enter to finish): ").strip()
+            if item_name == "":
+                if len(items) == 0:
+                    print("Please enter at least one item.")
+                    continue
+                break
+
+            while True:
+                cost_text = input(f"Cost of {item_name}: $").strip()
+                try:
+                    cost = float(cost_text)
+                    if cost < 0:
+                        print("Cost cannot be negative. Try again.")
+                    else:
+                        break
+                except ValueError:
+                    print("Please enter a number, e.g. 25 or 19.99")
+
+            if cost == int(cost):
+                cost = int(cost)    # show $450 instead of $450.0
+            items.append((item_name, cost))
+        return items
+
+    @classmethod
+    def submit_requisition(cls):
+        # data capture: staff type in their details and items
+        print()
+        print("--- New Requisition ---")
+        staff_id = ""
+        while staff_id == "":
+            staff_id = input("Staff ID: ").strip().upper()
+        staff_name = ""
+        while staff_name == "":
+            staff_name = input("Staff Name: ").strip()
+        req_date = input("Date (dd/mm/yyyy, press Enter for today): ").strip()
+
+        req = cls(staff_id, staff_name, req_date)
+        items = cls.capture_items()
+        total = req.requisitions_details(items)
+        req.approve_requisition()
+        print(f"Requisition {req.requisition_id} submitted. Total: ${total}. Status: {req.status}")
+        return req
